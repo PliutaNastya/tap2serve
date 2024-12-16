@@ -324,6 +324,7 @@
             location: 8
         }
     };
+    const sliders = document.querySelectorAll('input[type="range"]');
     const tagRange = document.getElementById("tagRange");
     const locationRange = document.getElementById("locationRange");
     const facebookCheckbox = document.getElementById("facebookCheckbox");
@@ -334,6 +335,15 @@
     const paymentTagElement = document.getElementById("paymentTag");
     const paymentLocationElement = document.getElementById("paymentLocation");
     const totalPriceElement = document.getElementById("totalValue");
+    function updateSliderBackground(slider) {
+        const value = slider.value;
+        const percentage = (value - slider.min) / (slider.max - slider.min) * 100;
+        slider.style.background = `linear-gradient(to right, #EA580C 0%, #EA580C ${percentage}%, #E1E1E1 ${percentage}%, #E1E1E1 100%)`;
+    }
+    sliders.forEach((slider => {
+        updateSliderBackground(slider);
+        slider.addEventListener("input", (() => updateSliderBackground(slider)));
+    }));
     function calculatePrice() {
         const tagCount = parseInt(tagRange.value, 10);
         const locationCount = parseInt(locationRange.value, 10);
