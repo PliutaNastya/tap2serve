@@ -229,6 +229,9 @@ h6 {
   color: #070707;
   font-weight: 700
 }
+.content-block__price-item span {
+  font-weight: 700
+}
 .header {
   position: sticky;
   top: 0;

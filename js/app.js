@@ -183,7 +183,7 @@
     const locationCountElement = document.getElementById("locationCount");
     const paymentTagElement = document.getElementById("paymentTag");
     const paymentLocationElement = document.getElementById("paymentLocation");
-    const totalPriceElement = document.getElementById("totalValue");
+    const monthlyPayment = document.getElementById("monthlyPayment");
     const firstMonthElement = document.getElementById("firstMonth");
     const nextMonthsElement = document.getElementById("nextMonths");
     function initSliders() {
@@ -216,14 +216,13 @@
         oneTimePayments += smiirlPrice;
         const locationPrice = locationCount * calculatorConfigs.locations.price_per_unit;
         monthlyPayments = locationPrice;
-        const totalPrice = oneTimePayments + monthlyPayments;
         tagCountElement.textContent = tagCount;
         locationCountElement.textContent = locationCount;
         paymentTagElement.textContent = tagPrice;
         paymentLocationElement.textContent = calculatorConfigs.locations.price_per_unit;
-        totalPriceElement.textContent = `$${totalPrice}`;
-        firstMonthElement.textContent = `$${oneTimePayments + calculatorConfigs.locations.price_per_unit}`;
-        nextMonthsElement.textContent = `$${monthlyPayments - calculatorConfigs.locations.price_per_unit}`;
+        monthlyPayment.textContent = `$${monthlyPayments}`;
+        firstMonthElement.textContent = `$${oneTimePayments + locationPrice}`;
+        nextMonthsElement.textContent = `$${monthlyPayments}`;
     }
     [ tagRange, locationRange, facebookCheckbox, tiktokCheckbox, instagramCheckbox ].forEach((element => {
         element.addEventListener("input", (() => {
