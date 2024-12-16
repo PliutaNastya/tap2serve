@@ -5,9 +5,6 @@
         if (location.hash) return location.hash.replace("#", "");
     }
     let bodyLockStatus = true;
-    let bodyLockToggle = (delay = 500) => {
-        if (document.documentElement.classList.contains("lock")) bodyUnlock(delay); else bodyLock(delay);
-    };
     let bodyUnlock = (delay = 500) => {
         if (bodyLockStatus) {
             const lockPaddingElements = document.querySelectorAll("[data-lp]");
@@ -24,29 +21,6 @@
             }), delay);
         }
     };
-    let bodyLock = (delay = 500) => {
-        if (bodyLockStatus) {
-            const lockPaddingElements = document.querySelectorAll("[data-lp]");
-            const lockPaddingValue = window.innerWidth - document.body.offsetWidth + "px";
-            lockPaddingElements.forEach((lockPaddingElement => {
-                lockPaddingElement.style.paddingRight = lockPaddingValue;
-            }));
-            document.body.style.paddingRight = lockPaddingValue;
-            document.documentElement.classList.add("lock");
-            bodyLockStatus = false;
-            setTimeout((function() {
-                bodyLockStatus = true;
-            }), delay);
-        }
-    };
-    function menuInit() {
-        if (document.querySelector(".icon-menu")) document.addEventListener("click", (function(e) {
-            if (bodyLockStatus && e.target.closest(".icon-menu")) {
-                bodyLockToggle();
-                document.documentElement.classList.toggle("menu-open");
-            }
-        }));
-    }
     function menuClose() {
         bodyUnlock();
         document.documentElement.classList.remove("menu-open");
@@ -93,142 +67,6 @@
             }
             functions_FLS(`[gotoBlock]: Юхуу...їдемо до ${targetBlock}`);
         } else functions_FLS(`[gotoBlock]: Йой... Такого блоку немає на сторінці: ${targetBlock}`);
-    };
-    function formFieldsInit(options = {
-        viewPass: false,
-        autoHeight: false
-    }) {
-        document.body.addEventListener("focusin", (function(e) {
-            const targetElement = e.target;
-            if (targetElement.tagName === "INPUT" || targetElement.tagName === "TEXTAREA") {
-                if (!targetElement.hasAttribute("data-no-focus-classes")) {
-                    targetElement.classList.add("_form-focus");
-                    targetElement.parentElement.classList.add("_form-focus");
-                }
-                formValidate.removeError(targetElement);
-                targetElement.hasAttribute("data-validate") ? formValidate.removeError(targetElement) : null;
-            }
-        }));
-        document.body.addEventListener("focusout", (function(e) {
-            const targetElement = e.target;
-            if (targetElement.tagName === "INPUT" || targetElement.tagName === "TEXTAREA") {
-                if (!targetElement.hasAttribute("data-no-focus-classes")) {
-                    targetElement.classList.remove("_form-focus");
-                    targetElement.parentElement.classList.remove("_form-focus");
-                }
-                targetElement.hasAttribute("data-validate") ? formValidate.validateInput(targetElement) : null;
-            }
-        }));
-        if (options.viewPass) document.addEventListener("click", (function(e) {
-            let targetElement = e.target;
-            if (targetElement.closest('[class*="__viewpass"]')) {
-                let inputType = targetElement.classList.contains("_viewpass-active") ? "password" : "text";
-                targetElement.parentElement.querySelector("input").setAttribute("type", inputType);
-                targetElement.classList.toggle("_viewpass-active");
-            }
-        }));
-        if (options.autoHeight) {
-            const textareas = document.querySelectorAll("textarea[data-autoheight]");
-            if (textareas.length) {
-                textareas.forEach((textarea => {
-                    const startHeight = textarea.hasAttribute("data-autoheight-min") ? Number(textarea.dataset.autoheightMin) : Number(textarea.offsetHeight);
-                    const maxHeight = textarea.hasAttribute("data-autoheight-max") ? Number(textarea.dataset.autoheightMax) : 1 / 0;
-                    setHeight(textarea, Math.min(startHeight, maxHeight));
-                    textarea.addEventListener("input", (() => {
-                        if (textarea.scrollHeight > startHeight) {
-                            textarea.style.height = `auto`;
-                            setHeight(textarea, Math.min(Math.max(textarea.scrollHeight, startHeight), maxHeight));
-                        }
-                    }));
-                }));
-                function setHeight(textarea, height) {
-                    textarea.style.height = `${height}px`;
-                }
-            }
-        }
-    }
-    let formValidate = {
-        getErrors(form) {
-            let error = 0;
-            let formRequiredItems = form.querySelectorAll("*[data-required]");
-            if (formRequiredItems.length) formRequiredItems.forEach((formRequiredItem => {
-                if ((formRequiredItem.offsetParent !== null || formRequiredItem.tagName === "SELECT") && !formRequiredItem.disabled) error += this.validateInput(formRequiredItem);
-            }));
-            return error;
-        },
-        validateInput(formRequiredItem) {
-            let error = 0;
-            if (formRequiredItem.dataset.required === "email") {
-                formRequiredItem.value = formRequiredItem.value.replace(" ", "");
-                if (this.emailTest(formRequiredItem)) {
-                    this.addError(formRequiredItem);
-                    this.removeSuccess(formRequiredItem);
-                    error++;
-                } else {
-                    this.removeError(formRequiredItem);
-                    this.addSuccess(formRequiredItem);
-                }
-            } else if (formRequiredItem.type === "checkbox" && !formRequiredItem.checked) {
-                this.addError(formRequiredItem);
-                this.removeSuccess(formRequiredItem);
-                error++;
-            } else if (!formRequiredItem.value.trim()) {
-                this.addError(formRequiredItem);
-                this.removeSuccess(formRequiredItem);
-                error++;
-            } else {
-                this.removeError(formRequiredItem);
-                this.addSuccess(formRequiredItem);
-            }
-            return error;
-        },
-        addError(formRequiredItem) {
-            formRequiredItem.classList.add("_form-error");
-            formRequiredItem.parentElement.classList.add("_form-error");
-            let inputError = formRequiredItem.parentElement.querySelector(".form__error");
-            if (inputError) formRequiredItem.parentElement.removeChild(inputError);
-            if (formRequiredItem.dataset.error) formRequiredItem.parentElement.insertAdjacentHTML("beforeend", `<div class="form__error">${formRequiredItem.dataset.error}</div>`);
-        },
-        removeError(formRequiredItem) {
-            formRequiredItem.classList.remove("_form-error");
-            formRequiredItem.parentElement.classList.remove("_form-error");
-            if (formRequiredItem.parentElement.querySelector(".form__error")) formRequiredItem.parentElement.removeChild(formRequiredItem.parentElement.querySelector(".form__error"));
-        },
-        addSuccess(formRequiredItem) {
-            formRequiredItem.classList.add("_form-success");
-            formRequiredItem.parentElement.classList.add("_form-success");
-        },
-        removeSuccess(formRequiredItem) {
-            formRequiredItem.classList.remove("_form-success");
-            formRequiredItem.parentElement.classList.remove("_form-success");
-        },
-        formClean(form) {
-            form.reset();
-            setTimeout((() => {
-                let inputs = form.querySelectorAll("input,textarea");
-                for (let index = 0; index < inputs.length; index++) {
-                    const el = inputs[index];
-                    el.parentElement.classList.remove("_form-focus");
-                    el.classList.remove("_form-focus");
-                    formValidate.removeError(el);
-                }
-                let checkboxes = form.querySelectorAll(".checkbox__input");
-                if (checkboxes.length > 0) for (let index = 0; index < checkboxes.length; index++) {
-                    const checkbox = checkboxes[index];
-                    checkbox.checked = false;
-                }
-                if (modules_flsModules.select) {
-                    let selects = form.querySelectorAll("div.select");
-                    if (selects.length) for (let index = 0; index < selects.length; index++) {
-                        const select = selects[index].querySelector("select");
-                        modules_flsModules.select.selectBuild(select);
-                    }
-                }
-            }), 0);
-        },
-        emailTest(formRequiredItem) {
-            return !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,8})+$/.test(formRequiredItem.value);
-        }
     };
     let addWindowScrollEvent = false;
     function pageNavigation() {
@@ -310,21 +148,31 @@
             }));
         }
     }), 0);
-    const prices = {
-        facebook: {
-            tag: 5,
-            location: 10
+    function script_menuInit() {
+        if (document.querySelector(".icon-menu")) document.addEventListener("click", (function(e) {
+            if (e.target.closest(".icon-menu")) document.documentElement.classList.toggle("menu-open");
+            if (e.target.closest(".menu") && document.documentElement.classList.contains("menu-open")) document.documentElement.classList.remove("menu-open");
+        }));
+    }
+    script_menuInit();
+    const calculatorConfigs = {
+        tags: {
+            min: 12,
+            max: 12 * 12,
+            step: 12,
+            price_per_unit: 6
         },
-        tiktok: {
-            tag: 3,
-            location: 7
+        locations: {
+            min: 1,
+            max: 30,
+            step: 1
         },
-        instagram: {
-            tag: 4,
-            location: 8
+        smiirl: {
+            facebook: 300,
+            instagram: 400,
+            tiktok: 500
         }
     };
-    const sliders = document.querySelectorAll('input[type="range"]');
     const tagRange = document.getElementById("tagRange");
     const locationRange = document.getElementById("locationRange");
     const facebookCheckbox = document.getElementById("facebookCheckbox");
@@ -335,49 +183,64 @@
     const paymentTagElement = document.getElementById("paymentTag");
     const paymentLocationElement = document.getElementById("paymentLocation");
     const totalPriceElement = document.getElementById("totalValue");
+    function initSliders() {
+        tagRange.min = calculatorConfigs.tags.min;
+        tagRange.max = calculatorConfigs.tags.max;
+        tagRange.step = calculatorConfigs.tags.step;
+        tagRange.value = calculatorConfigs.tags.min;
+        locationRange.min = calculatorConfigs.locations.min;
+        locationRange.max = calculatorConfigs.locations.max;
+        locationRange.step = calculatorConfigs.locations.step;
+        locationRange.value = calculatorConfigs.locations.min;
+    }
+    initSliders();
     function updateSliderBackground(slider) {
         const value = slider.value;
         const percentage = (value - slider.min) / (slider.max - slider.min) * 100;
         slider.style.background = `linear-gradient(to right, #EA580C 0%, #EA580C ${percentage}%, #E1E1E1 ${percentage}%, #E1E1E1 100%)`;
     }
-    sliders.forEach((slider => {
-        updateSliderBackground(slider);
-        slider.addEventListener("input", (() => updateSliderBackground(slider)));
-    }));
     function calculatePrice() {
         const tagCount = parseInt(tagRange.value, 10);
         const locationCount = parseInt(locationRange.value, 10);
-        let totalTagPrice = 0;
-        let totalLocationPrice = 0;
-        if (facebookCheckbox.checked) {
-            totalTagPrice += tagCount * prices.facebook.tag;
-            totalLocationPrice += locationCount * prices.facebook.location;
-        }
-        if (tiktokCheckbox.checked) {
-            totalTagPrice += tagCount * prices.tiktok.tag;
-            totalLocationPrice += locationCount * prices.tiktok.location;
-        }
-        if (instagramCheckbox.checked) {
-            totalTagPrice += tagCount * prices.instagram.tag;
-            totalLocationPrice += locationCount * prices.instagram.location;
-        }
-        const totalPrice = totalTagPrice + totalLocationPrice;
+        let totalPrice = 0;
+        const tagPrice = tagCount * calculatorConfigs.tags.price_per_unit;
+        let locationPrice = 0;
+        if (facebookCheckbox.checked) locationPrice += calculatorConfigs.smiirl.facebook;
+        if (tiktokCheckbox.checked) locationPrice += calculatorConfigs.smiirl.tiktok;
+        if (instagramCheckbox.checked) locationPrice += calculatorConfigs.smiirl.instagram;
+        totalPrice = tagPrice + locationPrice * locationCount;
         tagCountElement.textContent = tagCount;
         locationCountElement.textContent = locationCount;
-        paymentTagElement.textContent = totalTagPrice;
-        paymentLocationElement.textContent = totalLocationPrice;
-        totalPriceElement.textContent = `$${totalPrice}`;
+        paymentTagElement.textContent = tagPrice.toFixed(2);
+        paymentLocationElement.textContent = locationPrice.toFixed(2);
+        totalPriceElement.textContent = `$${totalPrice.toFixed(2)}`;
     }
     [ tagRange, locationRange, facebookCheckbox, tiktokCheckbox, instagramCheckbox ].forEach((element => {
-        element.addEventListener("input", calculatePrice);
+        element.addEventListener("input", (() => {
+            calculatePrice();
+            updateSliderBackground(element);
+        }));
     }));
     calculatePrice();
+    document.getElementById("contactForm").addEventListener("submit", (async function(event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+        try {
+            const response = await fetch("/foo/bar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+            if (response.ok) console.log("Form submitted successfully!"); else console.log("Error submitting the form.");
+        } catch (error) {
+            console.error("Error:", error);
+            console.log("Failed to send form.");
+        }
+    }));
     window["FLS"] = true;
-    menuInit();
-    formFieldsInit({
-        viewPass: false,
-        autoHeight: false
-    });
     pageNavigation();
     headerScroll();
 })();
