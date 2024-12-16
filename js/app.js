@@ -184,6 +184,8 @@
     const paymentTagElement = document.getElementById("paymentTag");
     const paymentLocationElement = document.getElementById("paymentLocation");
     const totalPriceElement = document.getElementById("totalValue");
+    const firstMonthElement = document.getElementById("firstMonth");
+    const nextMonthsElement = document.getElementById("nextMonths");
     function initSliders() {
         tagRange.min = calculatorConfigs.tags.min;
         tagRange.max = calculatorConfigs.tags.max;
@@ -203,19 +205,25 @@
     function calculatePrice() {
         const tagCount = parseInt(tagRange.value, 10);
         const locationCount = parseInt(locationRange.value, 10);
-        let totalPrice = 0;
+        let oneTimePayments = 0;
+        let monthlyPayments = 0;
         const tagPrice = tagCount * calculatorConfigs.tags.price_per_unit;
-        const locationPrice = locationCount * calculatorConfigs.locations.price_per_unit;
+        oneTimePayments += tagPrice;
         let smiirlPrice = 0;
         if (facebookCheckbox.checked) smiirlPrice += calculatorConfigs.smiirl.facebook;
         if (tiktokCheckbox.checked) smiirlPrice += calculatorConfigs.smiirl.tiktok;
         if (instagramCheckbox.checked) smiirlPrice += calculatorConfigs.smiirl.instagram;
-        totalPrice = tagPrice + locationPrice + smiirlPrice;
+        oneTimePayments += smiirlPrice;
+        const locationPrice = locationCount * calculatorConfigs.locations.price_per_unit;
+        monthlyPayments = locationPrice;
+        const totalPrice = oneTimePayments + monthlyPayments;
         tagCountElement.textContent = tagCount;
         locationCountElement.textContent = locationCount;
         paymentTagElement.textContent = tagPrice;
-        paymentLocationElement.textContent = locationPrice;
+        paymentLocationElement.textContent = calculatorConfigs.locations.price_per_unit;
         totalPriceElement.textContent = `$${totalPrice}`;
+        firstMonthElement.textContent = `$${oneTimePayments + calculatorConfigs.locations.price_per_unit}`;
+        nextMonthsElement.textContent = `$${monthlyPayments - calculatorConfigs.locations.price_per_unit}`;
     }
     [ tagRange, locationRange, facebookCheckbox, tiktokCheckbox, instagramCheckbox ].forEach((element => {
         element.addEventListener("input", (() => {
