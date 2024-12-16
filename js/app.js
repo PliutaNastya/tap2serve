@@ -165,7 +165,8 @@
         locations: {
             min: 1,
             max: 30,
-            step: 1
+            step: 1,
+            price_per_unit: 89
         },
         smiirl: {
             facebook: 300,
@@ -204,16 +205,17 @@
         const locationCount = parseInt(locationRange.value, 10);
         let totalPrice = 0;
         const tagPrice = tagCount * calculatorConfigs.tags.price_per_unit;
-        let locationPrice = 0;
-        if (facebookCheckbox.checked) locationPrice += calculatorConfigs.smiirl.facebook;
-        if (tiktokCheckbox.checked) locationPrice += calculatorConfigs.smiirl.tiktok;
-        if (instagramCheckbox.checked) locationPrice += calculatorConfigs.smiirl.instagram;
-        totalPrice = tagPrice + locationPrice * locationCount;
+        const locationPrice = locationCount * calculatorConfigs.locations.price_per_unit;
+        let smiirlPrice = 0;
+        if (facebookCheckbox.checked) smiirlPrice += calculatorConfigs.smiirl.facebook;
+        if (tiktokCheckbox.checked) smiirlPrice += calculatorConfigs.smiirl.tiktok;
+        if (instagramCheckbox.checked) smiirlPrice += calculatorConfigs.smiirl.instagram;
+        totalPrice = tagPrice + locationPrice + smiirlPrice;
         tagCountElement.textContent = tagCount;
         locationCountElement.textContent = locationCount;
-        paymentTagElement.textContent = tagPrice.toFixed(2);
-        paymentLocationElement.textContent = locationPrice.toFixed(2);
-        totalPriceElement.textContent = `$${totalPrice.toFixed(2)}`;
+        paymentTagElement.textContent = tagPrice;
+        paymentLocationElement.textContent = locationPrice;
+        totalPriceElement.textContent = `$${totalPrice}`;
     }
     [ tagRange, locationRange, facebookCheckbox, tiktokCheckbox, instagramCheckbox ].forEach((element => {
         element.addEventListener("input", (() => {
