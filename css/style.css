@@ -227,7 +227,6 @@ h6 {
 }
 .content-block__value {
   color: #070707;
-  font-size: 6.25rem;
   font-weight: 700
 }
 .header {
@@ -1130,6 +1129,9 @@ h6 {
   .content-block__text p {
     font-size: 1.375rem
   }
+  .content-block__value {
+    font-size: 6.25rem
+  }
   .header__logo span {
     font-size: 2rem
   }
@@ -1280,6 +1282,9 @@ h6 {
   }
   .content-block__text p {
     font-size: 1.125rem
+  }
+  .content-block__value {
+    font-size: 3.125rem
   }
   .header__logo span {
     font-size: 1.25rem
@@ -1578,6 +1583,9 @@ h6 {
   }
   .content-block__text p {
     font-size: clamp(1.125rem ,1.0441919192rem + .404040404vw ,1.375rem)
+  }
+  .content-block__value {
+    font-size: clamp(3.125rem ,2.1148989899rem + 5.0505050505vw ,6.25rem)
   }
   .header__logo span {
     font-size: clamp(1.25rem ,1.0075757576rem + 1.2121212121vw ,2rem)
